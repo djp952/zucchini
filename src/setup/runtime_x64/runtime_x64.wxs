@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	
+		<?include ..\..\common\buildenv.wxi ?>
+		<?include $(var.ZucchiniSourcePath)web\_version\webversion.wxi ?>
+	
+		<Product Id="07130566-8BA2-426c-9618-1DD66E081F67" 
+			Name="Zucchini $(var.ProjectVersion.2) Runtime (x64)" 
+			Language="1033" 
+			Version="$(var.ProjectVersion.3)" 
+			Manufacturer="ZukiSoft" 
+			UpgradeCode="B3D32BAD-6D86-4ccb-AF8E-6E1072A90090">
+		
+		<Package InstallerVersion="300" Compressed="yes" Platforms="x64"/>
+		<Media Id="1" Cabinet="runtime_x64.cab" EmbedCab="yes" />
+
+		<!-- CONDITION: Microsoft .NET Framework 2.0 -->
+		<Condition Message='The Microsoft .NET Framework version 2.0 (or higher) is not installed. Please install before running Zucchini Runtime setup.'>
+			<![CDATA[MsiNetAssemblySupport >= "2.0.50727"]]>
+		</Condition>
+
+		<!-- CONDITION: Windows XP Service Pack 2 or higher -->
+		<Condition Message='The Zucchini Runtime requires Microsoft Windows XP Service Pack 2 (or higher).'>
+			(VersionNT >= 502) OR (VersionNT = 501 AND ServicePackLevel >= 2)
+		</Condition>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Merge Id="zucchini" Language="0" DiskId="1" SourceFile="$(var.ZucchiniRedistPath)zucchini-runtime-x64.msm"/>
+			<Merge Id="msvcrt" Language="0" DiskId="1" SourceFile="$(var.MergeModulePath)Microsoft_VC80_CRT_x86_x64.msm"/>
+			<Merge Id="msvcrtpol" Language="0" DiskId="1" SourceFile="$(var.MergeModulePath)policy_8_0_Microsoft_VC80_CRT_x86_x64.msm"/>
+    </Directory>
+
+		<Feature Id="RuntimeFeature" Title="Zucchini Runtime (x64)" Level="1"
+				Description="Installs the Zucchini and Microsoft Visual C++ Runtime Libraries (as necessary)"
+				Absent="disallow" AllowAdvertise="no">
+			<MergeRef Id="zucchini" />
+			<MergeRef Id="msvcrt" />
+			<MergeRef Id="msvcrtpol" />
+		</Feature>
+
+	<UIRef Id="WixUI_FeatureTree"/>
+
+	</Product>
+</Wix>

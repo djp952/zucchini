@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+	<?include ..\..\common\buildenv.wxi ?>
+	<?include $(var.ZucchiniSourcePath)web\_version\webversion.wxi ?>
+
+	<Module Id="ZucchiniRuntime" Language="0" Version="$(var.ProjectVersion.2)">
+		<Package Id="7EE002B1-E24A-419a-A137-AE432A201B05" Manufacturer="ZukiSoft"
+			InstallerVersion="300" Platforms="x64"/>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="MergeRedirectFolder">
+
+				<Component Id="RuntimeComponent" Guid="1FB392A8-ADF0-4973-A748-61EA68CE59B1" Win64="yes">
+					<File Id="zws_gac" Name="zuki.web.server.dll"
+						Source="$(var.ZucchiniBinPath)web\x64\zuki.web.server.dll"
+						ProcessorArchitecture="x64"
+						Assembly=".net" KeyPath="yes" Vital="yes"/>
+				</Component>
+
+			</Directory>
+		</Directory>
+
+	</Module>
+</Wix>

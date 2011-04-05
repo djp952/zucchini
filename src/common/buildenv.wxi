@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+
+	<!-- MergeModulePath -->
+	<!-- Set to the location of the VS2005 Merge Modules -->
+	<?if $(env.PROCESSOR_ARCHITECTURE) = "x86" ?>
+	<?define MergeModulePath = $(env.CommonProgramFiles)\Merge Modules\ ?>
+	<?else ?>
+	<?define MergeModulePath = $(env.CommonProgramFiles(x86))\Merge Modules\ ?>
+	<?endif ?>
+
+	<!-- ZucchiniSourcePath -->
+	<!-- Set to the root \src path for the Zucchini project -->
+	<?define ZucchiniSourcePath = \zucchini\src\ ?>
+
+	<!-- ZucchiniBinPath -->
+	<!-- Set to the root \bin path for the Zucchini project -->
+	<?define ZucchiniBinPath = \zucchini\bin\ ?>
+
+	<!-- ZucchiniDistPath -->
+	<!-- Set to the root \dist path for the Zucchini project -->
+	<?define ZucchiniDistPath = \zucchini\dist\ ?>
+
+	<!-- ZucchiniRedistPath -->
+	<!-- Set to the root \redist path for the Zucchini project -->
+	<?define ZucchiniRedistPath = \zucchini\redist\ ?>
+
+</Include>

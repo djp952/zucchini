@@ -1,0 +1,3 @@
+
+COMMAND: c:\windows\system32\rundll32.exe
+COMMAND ARGUMENTS: shell32.dll,Control_RunDLL "$(TargetPath)"

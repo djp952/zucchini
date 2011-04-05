@@ -1,0 +1,160 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7F383652-71B9-4348-AABD-37A8F631D6C3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>zucchini.tools.httpconfig.applet</RootNamespace>
+    <AssemblyName>httpconfig.applet</AssemblyName>
+                  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\..\bin\tools\x86\temp\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>..\..\..\..\bin\tools\x86\temp\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\..\bin\tools\x64\temp\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <NoWarn>1607</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>..\..\..\..\bin\tools\x64\temp\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <NoWarn>1607</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\common\ui\VistaCommandLink.cs">
+      <Link>ui\VistaCommandLink.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaCommandLink.designer.cs">
+      <Link>ui\VistaCommandLink.designer.cs</Link>
+      <DependentUpon>VistaCommandLink.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaForm.cs">
+      <Link>ui\VistaForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaForm.designer.cs">
+      <Link>ui\VistaForm.designer.cs</Link>
+      <DependentUpon>VistaForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaLink.cs">
+      <Link>ui\VistaLink.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaLink.designer.cs">
+      <Link>ui\VistaLink.designer.cs</Link>
+      <DependentUpon>VistaLink.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaMainInstruction.cs">
+      <Link>ui\VistaMainInstruction.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaMainInstruction.designer.cs">
+      <Link>ui\VistaMainInstruction.designer.cs</Link>
+      <DependentUpon>VistaMainInstruction.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaMetaDataLabel.cs">
+      <Link>ui\VistaMetaDataLabel.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaMetaDataLabel.designer.cs">
+      <Link>ui\VistaMetaDataLabel.designer.cs</Link>
+      <DependentUpon>VistaMetaDataLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaMetaDataLink.cs">
+      <Link>ui\VistaMetaDataLink.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaMetaDataLink.designer.cs">
+      <Link>ui\VistaMetaDataLink.designer.cs</Link>
+      <DependentUpon>VistaMetaDataLink.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaStaticSeparator.cs">
+      <Link>ui\VistaStaticSeparator.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\..\common\ui\VistaStaticSeparator.Designer.cs">
+      <Link>ui\VistaStaticSeparator.Designer.cs</Link>
+      <DependentUpon>VistaStaticSeparator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\common\zukiCopyright.cs">
+      <Link>zukiCopyright.cs</Link>
+    </Compile>
+    <Compile Include="..\..\_version\toolsVersion.cs">
+      <Link>toolsVersion.cs</Link>
+    </Compile>
+    <Compile Include="HttpConfigApplet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HttpConfigApplet.Designer.cs">
+      <DependentUpon>HttpConfigApplet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HttpConfigApplet.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>HttpConfigApplet.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphics\httpconfig.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphics\web-164x164-50percent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphics\web-164x164.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
