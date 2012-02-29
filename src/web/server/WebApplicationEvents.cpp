@@ -59,10 +59,11 @@ WebApplicationEventArgs::WebApplicationEventArgs(Host^ host)
 //
 //	NONE
 
-void WebApplicationEvent::Invoke(void)
+Object^ WebApplicationEvent::Invoke(void)
 {
 	Debug::Assert(m_domain != nullptr);
 	m_domain->DoCallBack(gcnew CrossAppDomainDelegate(this, &WebApplicationEvent::DoCallback));
+	return m_domain->GetData(RESULT_OBJECT);
 }
 
 //---------------------------------------------------------------------------
@@ -82,46 +83,7 @@ void WebApplicationEvent::Invoke(void)
 void WebApplicationActivityEvent::DoCallback(void)
 {
 	WebServer::OnApplicationActivity(m_appid, m_activity);
-}
-
-//---------------------------------------------------------------------------
-// WebApplicationAssemblyResolveEvent Implementation
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-// WebApplicationAssemblyResolveEvent::DoCallback (protected)
-//
-// Actually invokes the method on the static WebServer instance from the
-// application domain that the Host was created from
-//
-// Arguments:
-//
-//	NONE
-
-void WebApplicationAssemblyResolveEvent::DoCallback(void)
-{
-	m_result = WebServer::OnApplicationAssemblyResolve(m_appid, 
-		gcnew ResolveEventArgs(m_name));
-}
-
-//---------------------------------------------------------------------------
-// WebApplicationResourceResolveEvent Implementation
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-// WebApplicationResourceResolveEvent::DoCallback (protected)
-//
-// Actually invokes the method on the static WebServer instance from the
-// application domain that the Host was created from
-//
-// Arguments:
-//
-//	NONE
-
-void WebApplicationResourceResolveEvent::DoCallback(void)
-{
-	m_result = WebServer::OnApplicationResourceResolve(m_appid, 
-		gcnew ResolveEventArgs(m_name));
+	AppDomain::CurrentDomain->SetData(RESULT_OBJECT, nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -141,6 +103,7 @@ void WebApplicationResourceResolveEvent::DoCallback(void)
 void WebApplicationRestartFailureEvent::DoCallback(void)
 {
 	WebServer::OnApplicationRestartFailure(m_appid, m_exception);
+	AppDomain::CurrentDomain->SetData(RESULT_OBJECT, nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -160,6 +123,7 @@ void WebApplicationRestartFailureEvent::DoCallback(void)
 void WebApplicationStartedEvent::DoCallback(void)
 {
 	WebServer::OnApplicationStarted(m_appid, m_args);
+	AppDomain::CurrentDomain->SetData(RESULT_OBJECT, nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -179,6 +143,7 @@ void WebApplicationStartedEvent::DoCallback(void)
 void WebApplicationStartingEvent::DoCallback(void)
 {
 	WebServer::OnApplicationStarting(m_appid, m_args);
+	AppDomain::CurrentDomain->SetData(RESULT_OBJECT, nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -198,6 +163,7 @@ void WebApplicationStartingEvent::DoCallback(void)
 void WebApplicationStoppedEvent::DoCallback(void)
 {
 	WebServer::OnApplicationStopped(m_appid, m_args);
+	AppDomain::CurrentDomain->SetData(RESULT_OBJECT, nullptr);
 }
 
 //---------------------------------------------------------------------------

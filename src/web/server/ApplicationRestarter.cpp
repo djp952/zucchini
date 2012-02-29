@@ -47,11 +47,12 @@ void ApplicationRestarter::Restart(Host^ host)
 	// Create an instance of the private Restarter class in the new application domain.
 	// From here on out it will handle the rest ...
 
+	// 02.20.2012 - Removed final evidence parameter (nullptr) due to obsolete warning
 	restartDomain->CreateInstance(ApplicationRestarter::Restarter::typeid->Assembly->FullName,
 		ApplicationRestarter::Restarter::typeid->FullName, false,
 		BindingFlags::CreateInstance | BindingFlags::Public | BindingFlags::Instance, 
 		nullptr, gcnew array<Object^>{host->ApplicationManager, host->ParentDomain, 
-		host->ApplicationID, host->Configuration, host->RestartCount}, nullptr, nullptr, nullptr);
+		host->ApplicationID, host->Configuration, host->RestartCount}, nullptr, nullptr);
 
 	restartDomain = nullptr;					// Release strong reference
 }

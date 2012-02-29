@@ -54,6 +54,7 @@ ref struct XmlConstants abstract sealed
 		static initonly String^ AccessMode = "accessmode";
 		static initonly String^ Authentication = "authentication";
 		static initonly String^ AutoRestart = "autorestart";
+		static initonly String^ CacheNtlmCredentials = "cachentlmcredentials";
 		static initonly String^ CustomRequestHeaders = "customrequestheaders";
 		static initonly String^ DefaultDocuments = "defaultdocuments";
 		static initonly String^ DefaultDomain = "defaultdomain";

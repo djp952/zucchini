@@ -94,6 +94,14 @@ public:
 		WebApplicationConfiguration^ get(void);
 	}
 
+	// ID
+	//
+	// Exposes the application identifier string
+	property String^ ID
+	{
+		String^ get(void) { return m_appid; }
+	}
+
 internal:
 
 	// INTERNAL CONSTRUCTOR

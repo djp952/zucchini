@@ -90,7 +90,10 @@ private:
 	// VERSION_RESOURCE
 	//
 	// Name of the resource with the server version information in it
-	static initonly String^	VERSION_RESOURCE = "webVersion.txt";
+	
+	// 02.20.2012 - Changed from "webVersion.txt" to "version.txt", file name
+	// changed as a result of enhancments to MKVERSION tool
+	static initonly String^	VERSION_RESOURCE = "version.txt";
 
 	//-----------------------------------------------------------------------
 	// Member Variables

@@ -32,13 +32,20 @@ BEGIN_NAMESPACE(server)
 
 StoragePathProvider::StoragePathProvider(WebApplicationConfiguration^ config)
 {
-	String^					filename;			// Storage file name
+	StorageConnectionStringBuilder^	csb;		// Storage connection string
+	String^							filename;	// Storage connection string
 
 	if(config == nullptr) throw gcnew ArgumentNullException();
 	if(config->VirtualFileSystem->Type != VirtualFileSystemType::StructuredStorage) 
 		throw gcnew InvalidOperationException();
 
-	filename = config->VirtualFileSystem->Store;
+	// Use the StorageConnectionStringBuilder to parse/access the components
+
+	csb = gcnew StorageConnectionStringBuilder(config->VirtualFileSystem->Store);
+
+	// Extract the structured storage file name from the "Data Source" key
+
+	filename = csb->DataSource;
 	if(String::IsNullOrEmpty(filename)) throw gcnew InvalidOperationException();
 
 	// Expand any embedded environment variables and convert to a full path

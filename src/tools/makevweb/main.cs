@@ -19,7 +19,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace zucchini.tools.makevweb
+namespace zuki.web.tools.makevweb
 {
 	static class Program
 	{
@@ -29,33 +29,9 @@ namespace zucchini.tools.makevweb
 		[STAThread]
 		static void Main()
 		{
-			AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
-		}
-
-		private const string STRUCTURED_x86 = "embedded.x86.zuki.data.structured.dll";
-		private const string STRUCTURED_x64 = "embedded.x64.zuki.data.structured.dll";
-
-		// TODO: Clean this mess up, it was just for testing purposes
-		static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-		{
-			if (args.Name.StartsWith("zuki.data.structured", StringComparison.OrdinalIgnoreCase))
-			{
-				string resName = (typeof(Program).Assembly.GetName().ProcessorArchitecture == ProcessorArchitecture.Amd64) ?
-					STRUCTURED_x64 : STRUCTURED_x86;
-
-				Stream resStream = typeof(Program).Assembly.GetManifestResourceStream(typeof(Program), resName);
-				if(resStream == null) return null;
-
-				byte[] rg = new byte[(int)resStream.Length];
-				resStream.Read(rg, 0, (int)resStream.Length);
-				resStream.Close();
-				
-				return Assembly.Load(rg);
-			}
-			return null;
 		}
 	}
 }

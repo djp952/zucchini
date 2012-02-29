@@ -130,7 +130,6 @@ void Host::Configure(System::Web::Hosting::ApplicationManager^ appManager,
 	AppDomain^ parentDomain, String^ appid, WebApplicationConfiguration^ config,
 	int restarts)
 {
-	Thread^							listenerThread;	// HTTP listener thread
 	WebApplicationStartingEvent^	starting;		// STARTING event handler
 	WebApplicationStartedEvent^		started;		// STARTED event handler
 
@@ -152,12 +151,6 @@ void Host::Configure(System::Web::Hosting::ApplicationManager^ appManager,
 	m_logging = (m_config->LoggingFormat != LoggingFormat::None);
 	m_restarts = restarts;
 
-	// Add event handlers to the parent domain so we can attempt to let the application
-	// resolve assemblies at runtime (usually not that useful of a feature in ASP.NET)
-
-	AppDomain::CurrentDomain->AssemblyResolve += gcnew ResolveEventHandler(this, &Host::OnAssemblyResolve);
-	AppDomain::CurrentDomain->ResourceResolve += gcnew ResolveEventHandler(this, &Host::OnResourceResolve);
-
 	// Configure the HTTP listener based on the configuration data provided by 
 	// the calling application. Note that exceptions here should be thrown OK
 	// back to the calling AppDomain since Win32Exception is serializable
@@ -165,6 +158,7 @@ void Host::Configure(System::Web::Hosting::ApplicationManager^ appManager,
 	m_listener->IgnoreWriteExceptions = true;
 	m_listener->AuthenticationSchemes = config->Authentication->Schemes;
 	m_listener->Realm = config->Authentication->Realm;
+	m_listener->UnsafeConnectionNtlmAuthentication = config->Authentication->CacheNtlmCredentials;
 
 	for each(UriPrefix^ prefix in m_config->Prefixes) {
 
@@ -207,18 +201,29 @@ void Host::Configure(System::Web::Hosting::ApplicationManager^ appManager,
 	starting = gcnew WebApplicationStartingEvent(m_parentDomain, m_appid, gcnew WebApplicationEventArgs(this));
 	starting->Invoke();
 
+	m_listener->Start();				// <--- START THE HTTP LISTENER INSTANCE
+
+#ifdef ASYNCHRONOUS_HOST_MODEL
+
+	// Start listening for requests asynchronously using the mechanisms built into the
+	// HttpListener class (maybe it will actually work better this time)
+
+	m_listener->BeginGetContext(gcnew AsyncCallback(&Host::ProcessRequestAsync), this);
+
+#else
+
 	// To combat problems with the HttpListener's asynchronous model (which it seems
 	// nobody can get to work properly), I've opted to go with a poor man's thread
 	// pool implementation instead now.  The requests will be received synchronously
 	// and then handed off to the thread pool for processing.  A slight hit, I know,
 	// but at least it can be STABLE now.  Gotta go with 'works' over 'fastest'.
 
-	m_listener->Start();
-
-	listenerThread = gcnew Thread(gcnew ThreadStart(this, &Host::ListenerThread));
+	Thread^ listenerThread = gcnew Thread(gcnew ThreadStart(this, &Host::ListenerThread));
 	listenerThread->IsBackground = true;
 	listenerThread->Priority = ThreadPriority::AboveNormal;
 	listenerThread->Start();
+
+#endif
 
 	// Now that everything started up successfully, inform the main WebServer
 	// class so it can invoke the necessary event(s) in it's AppDomain
@@ -348,6 +353,8 @@ IntPtr Host::GetRequestToken(HttpListenerContext^ context, bool% close)
 //
 //	NONE
 
+#ifndef ASYNCHRONOUS_HOST_MODEL
+
 void Host::ListenerThread(void)
 {
 	// This thread doesn't control the listener start/stop, it just keeps on
@@ -377,6 +384,8 @@ void Host::ListenerThread(void)
 	}
 }
 
+#endif
+
 //---------------------------------------------------------------------------
 // Host::LoadErrorPage (private, static)
 //
@@ -403,56 +412,6 @@ array<Byte>^ Host::LoadErrorPage(String^ page)
 
 	catch(Exception^) { return s_emptyArray; }
 	finally { if(reader != nullptr) reader->Close(); }
-}
-
-//---------------------------------------------------------------------------
-// Host::OnAssemblyResolve (private)
-//
-// Handler for the host application domain's AssemblyResolve event
-//
-// Arguments:
-//
-//	sender		- Object raising this event
-//	args		- Event argument data
-
-Assembly^ Host::OnAssemblyResolve(Object^, ResolveEventArgs^ args)
-{
-	WebApplicationAssemblyResolveEvent^		resolver;	// Custom event instance
-
-	try { 
-	
-		resolver = gcnew WebApplicationAssemblyResolveEvent(m_parentDomain, m_appid, args);
-		
-		resolver->Invoke();				// Invoke the event on the right domain
-		return resolver->Result;		// Return the result from the event handler
-	}
-
-	catch(Exception^) { return nullptr; }		// Not much else we can do
-}
-
-//---------------------------------------------------------------------------
-// Host::OnResourceResolve (private)
-//
-// Handler for the host application domain's ResourceResolve event
-//
-// Arguments:
-//
-//	sender		- Object raising this event
-//	args		- Event argument data
-
-Assembly^ Host::OnResourceResolve(Object^, ResolveEventArgs^ args)
-{
-	WebApplicationResourceResolveEvent^		resolver;	// Custom event instance
-
-	try { 
-	
-		resolver = gcnew WebApplicationResourceResolveEvent(m_parentDomain, m_appid, args);
-		
-		resolver->Invoke();				// Invoke the event on the right domain
-		return resolver->Result;		// Return the result from the event handler
-	}
-
-	catch(Exception^) { return nullptr; }		// Not much else we can do
 }
 
 //---------------------------------------------------------------------------
@@ -866,6 +825,57 @@ void Host::ProcessRequest(Object^ state)
 }
 
 //---------------------------------------------------------------------------
+// Host::ProcessRequestAsync (private, static)
+//
+// Used in conjunction with the Asynchronous request processing model, which
+// didn't work very well for me in the past, so it's really just a wrapper
+// around the existing ProcessRequest() method.  Not that there's anything
+// wrong with that, but if you still see #ifdef ASYNCHRONOUS_HOST_MODEL in
+// this code, I'm still worried that it won't work properly again.
+//
+// Arguments:
+//
+//	async			- IAsyncResult instance for this request
+
+#ifdef ASYNCHRONOUS_HOST_MODEL
+
+void Host::ProcessRequestAsync(IAsyncResult^ result)
+{
+	Host^					instance;						// Invoking Host instance
+	HttpListener^			listener;						// Listener instance
+	HttpListenerContext^	context = nullptr;				// Asynchronous context
+
+	// The call to BeginGetContext needed to pass the parent Host instance in as the
+	// argument so we can lock on it, get the listener, etc, etc, etc ...
+
+	instance = safe_cast<Host^>(result->AsyncState);
+	if(instance == nullptr) throw gcnew ArgumentNullException();
+
+	listener = instance->m_listener;				// Pull this out for clarity below
+
+	// One of the fatal flaws from the first time I tried this was an ObjectDisposedException
+	// that happened at EndGetContext.  By locking the call to stop the listener and checking
+	// to make sure it's actually running first, that problem seems to go away.  Of course,
+	// that wasn't the BIG problem I was having with this model, but we'll see what happens
+
+	lock cs(instance);
+	try { 
+
+		if(listener->IsListening) {
+
+			context = listener->EndGetContext(result);
+			listener->BeginGetContext(gcnew AsyncCallback(&Host::ProcessRequestAsync), instance);
+		}
+	}
+
+	finally { cs.release(); }				// Always release the critical section
+
+	if(context != nullptr) instance->ProcessRequest(context);	// PROCESS REQUEST
+}
+
+#endif	// ASYNCHRONOUS_HOST_MODEL
+
+//---------------------------------------------------------------------------
 // Host::Shutdown (private)
 //
 // Stops and unregisters the host
@@ -876,9 +886,22 @@ void Host::ProcessRequest(Object^ state)
 
 void Host::Shutdown(bool)
 {
-	WebApplicationStoppedEvent^		stopped;		// STOPPED event handler
+	WebApplicationStoppedEvent^	stopped;						// STOPPED event handler
 
 	CHECK_DISPOSED(m_disposed);
+
+#ifdef ASYNCHRONOUS_HOST_MODEL
+
+	// Wait for pending requests to all finish and shut down the listener.  Prevent
+	// the asynchronous ProcessRequestAsync() method from calling EndGetContext or
+	// trying to invoke a new BeginGetContext by locking on ourselves
+
+	lock cs(this);
+
+	try { m_listener->Close(); }				// Close the listener instance
+	finally { cs.release(); }					// Always release the critical section			
+	
+#else
 
 	// Wait for pending requests to all finish and shut down the listener.  This
 	// can cause I/O exceptions from time to time that really aren't important
@@ -887,6 +910,8 @@ void Host::Shutdown(bool)
 
 	try { m_listener->Close(); }
 	catch(Exception^) { /* DO NOTHING */ }
+
+#endif
 
 	// Invoke the static event hook on the main WebServer class to inform the
 	// calling application that this application has been stopped
@@ -898,8 +923,14 @@ void Host::Shutdown(bool)
 	// If the application host was shut down automatically for some reason
 	// (reason will be 'None' on a manual shutdown), attempt to automatically
 	// restart it with the assistance of the ApplicationRestarter class
-	
-	if(HostingEnvironment::ShutdownReason != ApplicationShutdownReason::None)
+	//
+	// Now a manual shutdown comes through as 'HostingEnvironment', not 'None'.
+	// I assume this must have happened in .NET 2.0 Service Pack 1, but regardless
+	// we need to look for both reason codes now, otherwise the host will restart
+	// as soon as it's shut down, which is probably not a very good thing at all
+
+	ApplicationShutdownReason reason = HostingEnvironment::ShutdownReason;
+	if((reason != ApplicationShutdownReason::None) && (reason != ApplicationShutdownReason::HostingEnvironment))
 		if(m_config->AutoRestart) ApplicationRestarter::Restart(this);
 
 	delete this;					// Destroy ourselves on shutdown

@@ -53,16 +53,6 @@ public:
 	// Fired when the application has generated activity
 	static event WebApplicationActivityHandler^ ApplicationActivity;
 
-	// ApplicationAssemblyResolve
-	//
-	// Fired when an application cannot locate a code assembly at runtime
-	static event WebApplicationAssemblyResolveHandler^ ApplicationAssemblyResolve;
-
-	// ApplicationResourceResolve
-	//
-	// Fired when an application cannot locate a resource assembly at runtime
-	static event WebApplicationAssemblyResolveHandler^ ApplicationResourceResolve;
-
 	// ApplicationRestartFailure
 	//
 	// Fired when a web application fails to restart
@@ -119,16 +109,6 @@ internal:
 	//
 	// Invoked when an application has generated activity
 	static void OnApplicationActivity(String^ appid, String^ activity);
-
-	// OnApplicationAssemblyResolve
-	//
-	// Invoked when an application cannot resolve a code assembly
-	static Assembly^ OnApplicationAssemblyResolve(String^ appid, ResolveEventArgs^ args);
-
-	// OnApplicationResourceResolve
-	//
-	// Invoked when an application cannot resolve a resource assembly
-	static Assembly^ OnApplicationResourceResolve(String^ appid, ResolveEventArgs^ args);
 
 	// OnApplicationRestartFailure
 	//

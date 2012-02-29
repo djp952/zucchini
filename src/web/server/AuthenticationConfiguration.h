@@ -48,6 +48,16 @@ public:
 	//-----------------------------------------------------------------------
 	// Properties
 
+	// CacheNtlmCredentials
+	//
+	// Defines the flag that instructs the listener to only authenticate
+	// NTLM clients once for any given TCP connection
+	property bool CacheNtlmCredentials
+	{
+		bool get(void) { return m_cacheNtlm; }
+		void set(bool value);
+	}
+
 	// DefaultDomain
 	//
 	// Defines the default domain to use for basic authentication
@@ -131,6 +141,7 @@ private:
 	bool						m_requireCert;		// Flag to require certs
 	bool						m_verifyCertDates;	// Flag to check cert dates
 	bool						m_verifyCertChain;	// Flag to check cert chain
+	bool						m_cacheNtlm;		// Flag to cache NTLM
 };
 
 //---------------------------------------------------------------------------

@@ -46,6 +46,18 @@ AuthenticationConfiguration::AuthenticationConfiguration(bool writable)
 	m_defaultDomain = String::Empty;
 	m_verifyCertDates = false;
 	m_verifyCertChain = false;
+	m_cacheNtlm = false;
+}
+
+//---------------------------------------------------------------------------
+// AuthenticationConfiguration::CacheNtlmCredentials::set
+//
+// Sets the flag to cache NTLM credentials for any given TCP connection
+
+void AuthenticationConfiguration::CacheNtlmCredentials::set(bool value)
+{ 
+	if(!m_writable) throw gcnew NotSupportedException();		
+	m_cacheNtlm = value; 
 }
 
 //---------------------------------------------------------------------------
@@ -75,6 +87,11 @@ void AuthenticationConfiguration::ReadXml(XmlNode^ parent)
 	if(parent == nullptr) throw gcnew ArgumentNullException();
 
 	try {
+
+		// <cachentlmcredentials>
+		//
+		node = parent->SelectSingleNode(XmlConstants::Elements::CacheNtlmCredentials);
+		if(node != nullptr) this->CacheNtlmCredentials = Convert::ToBoolean(node->InnerText);
 
 		// <defaultdomain>
 		//
@@ -169,6 +186,10 @@ void AuthenticationConfiguration::Schemes::set(AuthenticationSchemes value)
 
 void AuthenticationConfiguration::ToXml(XmlWriter^ writer)
 {
+	// <cachentlmcredentials>
+	//
+	writer->WriteElementString(XmlConstants::Elements::CacheNtlmCredentials, m_cacheNtlm.ToString());
+
 	// <defaultdomain>
 	//
 	writer->WriteElementString(XmlConstants::Elements::DefaultDomain, m_defaultDomain);

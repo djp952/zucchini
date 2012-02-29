@@ -27,7 +27,7 @@ using System.Windows.Forms.VisualStyles;
 using System.Xml;
 using zuki.data.structured;
 
-namespace zucchini.tools.makevweb
+namespace zuki.web.tools.makevweb
 {
 	public partial class MainForm : zuki.ui.VistaForm
 	{

@@ -1,4 +1,4 @@
-namespace zucchini.tools.makevweb
+namespace zuki.web.tools.makevweb
 {
 	partial class MainForm
 	{

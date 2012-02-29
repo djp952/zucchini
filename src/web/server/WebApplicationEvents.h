@@ -175,13 +175,21 @@ public:
 	// Invoke
 	//
 	// Invokes the derived class' callback in the proper app domain
-	void Invoke(void);
+	Object^ Invoke(void);
 
 protected:
 
 	// PROTECTED CONSTRUCTOR
 	WebApplicationEvent(AppDomain^ domain, String^ appid, WebApplicationEventArgs^ args) :
 	  m_domain(domain), m_appid(appid), m_args(args) {}
+
+	//-----------------------------------------------------------------------
+	// Protected Constants
+
+	// RESULT_OBJECT
+	//
+	// Name assigned to the result object passed across domains
+	static initonly String^ RESULT_OBJECT = "__result";
 
 	//-----------------------------------------------------------------------
 	// Protected Member Functions
@@ -239,114 +247,6 @@ private:
 	// Member Variables
 
 	String^				m_activity;			// The activity message to send
-};
-
-//---------------------------------------------------------------------------
-// WebApplicationAssemblyResolveEvent (internal)
-//
-// Specialization of WebApplicationEvent to handle an assembly resolve
-//---------------------------------------------------------------------------
-
-[Serializable()]
-ref class WebApplicationAssemblyResolveEvent : WebApplicationEvent
-{
-public:
-
-	//-----------------------------------------------------------------------
-	// Constructor
-	//
-	// Arguments:
-	//
-	//	domain		- AppDomain to invoke the callback in
-	//	appid		- Web application ID string
-	//	args		- The original assembly resolution event arguments
-
-	WebApplicationAssemblyResolveEvent(AppDomain^ domain, String^ appid, 
-		ResolveEventArgs^ args) : WebApplicationEvent(domain, appid, 
-		WebApplicationEventArgs::Empty), m_name(args->Name), m_result(nullptr) {}
-
-	//-----------------------------------------------------------------------
-	// Properties
-
-	// Result
-	//
-	// Exposes the result from the event invocation
-	property Assembly^ Result
-	{
-		Assembly^ get(void) { return m_result; }
-	}
-
-protected:
-
-	//-----------------------------------------------------------------------
-	// Protected Member Functions
-
-	// DoCallback
-	//
-	// Executes the callback in the proper application domain
-	virtual void DoCallback(void) override;
-
-private:
-
-	//-----------------------------------------------------------------------
-	// Member Variables
-
-	String^					m_name;			// The argument data to send
-	Assembly^				m_result;		// Result from event invocation
-};
-
-//---------------------------------------------------------------------------
-// WebApplicationResourceResolveEvent (internal)
-//
-// Specialization of WebApplicationEvent to handle a resource resolve
-//---------------------------------------------------------------------------
-
-[Serializable()]
-ref class WebApplicationResourceResolveEvent : WebApplicationEvent
-{
-public:
-
-	//-----------------------------------------------------------------------
-	// Constructor
-	//
-	// Arguments:
-	//
-	//	domain		- AppDomain to invoke the callback in
-	//	appid		- Web application ID string
-	//	args		- The original assembly resolution event arguments
-
-	WebApplicationResourceResolveEvent(AppDomain^ domain, String^ appid, 
-		ResolveEventArgs^ args) : WebApplicationEvent(domain, appid, 
-		WebApplicationEventArgs::Empty), m_name(args->Name), m_result(nullptr) {}
-
-	//-----------------------------------------------------------------------
-	// Properties
-
-	// Result
-	//
-	// Exposes the result from the event invocation
-	property Assembly^ Result
-	{
-		Assembly^ get(void) { return m_result; }
-	}
-
-protected:
-
-	//-----------------------------------------------------------------------
-	// Protected Member Functions
-
-	// DoCallback
-	//
-	// Executes the callback in the proper application domain
-	virtual void DoCallback(void) override;
-
-private:
-
-	//-----------------------------------------------------------------------
-	// Member Variables
-
-	String^					m_name;			// The argument data to send
-	Assembly^				m_result;		// Result from event invocation
 };
 
 //---------------------------------------------------------------------------

@@ -55,38 +55,6 @@ void WebServer::OnApplicationActivity(String^ appid, String^ activity)
 }
 
 //---------------------------------------------------------------------------
-// WebServer::OnApplicationAssemblyResolve
-//
-// Invoked when a web application cannot resolve a code assembly
-//
-// Arguments:
-//
-//	appid		- Application ID string of the reference application
-//	args		- Assembly resolution arguments from calling appdomain
-
-Assembly^ WebServer::OnApplicationAssemblyResolve(String^ appid, ResolveEventArgs^ args)
-{
-	try { return ApplicationAssemblyResolve(appid, args); }
-	catch(Exception^) { return nullptr; }
-}
-
-//---------------------------------------------------------------------------
-// WebServer::OnApplicationResourceResolve
-//
-// Invoked when a web application cannot resolve a resource assembly
-//
-// Arguments:
-//
-//	appid		- Application ID string of the reference application
-//	args		- Assembly resolution arguments from calling appdomain
-
-Assembly^ WebServer::OnApplicationResourceResolve(String^ appid, ResolveEventArgs^ args)
-{
-	try { return ApplicationResourceResolve(appid, args); }
-	catch(Exception^) { return nullptr; }
-}
-
-//---------------------------------------------------------------------------
 // WebServer::OnApplicationRestartFailure
 //
 // Invoked when a web application could not be restarted

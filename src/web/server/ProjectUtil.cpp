@@ -118,12 +118,15 @@ int ProjectUtil::FindOpenTcpPort(void)
 
 			for(DWORD tableIndex = 0; tableIndex < pTcpTable->dwNumEntries; tableIndex++) {
 
-				if(port == static_cast<int>(pTcpTable->table[tableIndex].dwLocalPort)) {
+				// FIX: The ports are stored in network byte order, so we need to ntohs them
+				// before we can actually know what they are.  Also of note is that they are
+				// 16-bit values stored in a 32-bit variable, so we have to be sure to cast them
+				// back into unsigned shorts BEFORE we convert the endian-ness.
 
-					inuse = true;
-					break;
-				}
-			
+				unsigned short localPort = static_cast<unsigned short>(pTcpTable->table[tableIndex].dwLocalPort);
+				localPort = ntohs(localPort);
+
+				if(port == localPort) { inuse = true; break; }
 			}
 
 			if(!inuse) return port;		// <-- Found an unused port; return it

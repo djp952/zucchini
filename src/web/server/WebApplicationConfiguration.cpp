@@ -512,7 +512,8 @@ void WebApplicationConfiguration::ToXml(XmlWriter^ writer)
 
 void WebApplicationConfiguration::Validate(WebApplicationConfiguration^ config)
 {
-	String^					value;			// Yanked out reference for brevity
+	StorageConnectionStringBuilder^	csb;	// Storage connection string builder
+	String^							value;	// Yanked out reference for brevity
 
 	// DEFAULT DOCUMENTS
 	//
@@ -589,15 +590,15 @@ void WebApplicationConfiguration::Validate(WebApplicationConfiguration^ config)
 
 	if(config->VirtualFileSystem->Type != VirtualFileSystemType::None) {
 
-		value = config->VirtualFileSystem->Store;
-		if(!File::Exists(value)) throw gcnew InvalidStorageFileException(value);
+		csb = gcnew StorageConnectionStringBuilder(config->VirtualFileSystem->Store);
+		if(!File::Exists(csb->DataSource)) throw gcnew InvalidStorageFileException(csb->DataSource);
 
 		// STRUCTURED STORAGE
 		if(config->VirtualFileSystem->Type == VirtualFileSystemType::StructuredStorage) {
 		
 			StructuredStorage^ storage = nullptr;
-			try { storage = StructuredStorage::Open(value, StorageOpenMode::Open, StorageAccessMode::ReadOnlyShared); }
-			catch(Exception^) { throw gcnew InvalidStorageFileException(value); }
+			try { storage = StructuredStorage::Open(csb->DataSource, StorageOpenMode::Open, StorageAccessMode::ReadOnlyShared); }
+			catch(Exception^) { throw gcnew InvalidStorageFileException(csb->DataSource); }
 			finally { if(storage != nullptr) delete storage; }
 		}
 	}

@@ -54,6 +54,16 @@ BEGIN_NAMESPACE(server)
 // far more simple than that of Cassini of other lower level socket versions
 //---------------------------------------------------------------------------
 
+///////////////////////////////////////
+//// TEMPORARY: ASYNCHRONOUS MODEL FLAG
+////
+//// Due to the extreme problems I had getting the HttpListener asynchronous
+//// model to work in the first place, I've left the hacked up workaround code
+//// in place.  Comment out the #define ASYNCHRONOUS_HOST_MODEL to put the old
+//// code back ...
+////
+#define ASYNCHRONOUS_HOST_MODEL (1)
+
 ref class Host : public MarshalByRefObject, IRegisteredObject
 {
 public:
@@ -186,25 +196,17 @@ private:
 	// Gets the user token to pass onto the Request handler
 	IntPtr GetRequestToken(HttpListenerContext^ context, bool% close);
 
+#ifndef ASYNCHRONOUS_HOST_MODEL
 	// ListenerThread
 	//
 	// Entry point for the main HTTP listener worker thread
 	void ListenerThread(void);
+#endif
 
 	// LoadErrorPage
 	//
 	// Loads a canned HTML error page from the resources
 	static array<Byte>^ LoadErrorPage(String^ page);
-
-	// OnAssemblyResolve
-	//
-	// Handler for the parent application domain's AssemblyResolve event
-	Assembly^ OnAssemblyResolve(Object^ sender, ResolveEventArgs^ args);
-
-	// OnResourceResolve
-	//
-	// Handler for the parent application domain's ResourceResolve event
-	Assembly^ OnResourceResolve(Object^ sender, ResolveEventArgs^ args);
 
 	// PreProcessAuthentication
 	//
@@ -250,6 +252,13 @@ private:
 	//
 	// Called from the worker thread to process a single request
 	void ProcessRequest(Object^ state);
+
+#ifdef ASYNCHRONOUS_HOST_MODEL
+	// ProcessRequestAsync
+	//
+	// Used to process requests in the asynchronous listener model
+	static void ProcessRequestAsync(IAsyncResult^ async);
+#endif
 
 	// Shutdown (IRegisteredObject)
 	//

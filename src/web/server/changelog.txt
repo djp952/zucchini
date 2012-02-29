@@ -1,8 +1,63 @@
 
-- TODO: VSS "Store" for StructuredStorage should be more connection string like, since
-  I want to extend it to allow things like embedding host application code and stuff.
-  Something like "Storage File=xxxxxxx" for now
+============
+ZUCCHINI 0.4
+============
+
+- New Visual Studio 2010 solution; target platform is now .NET 4.0
+
+- New enhanced MKVERSION tool and associated changes to accomodate it.  A master version
+  file, build\version.ini can be used and checked in to automatically set the base version
+  number, or used to override the code to a specific version for compatibility/patching.
+
+============
+ZUCCHINI 0.3
+============
+
+ENHANCEMENTS
+
+- WebApplication: Exposed the application identifier as a new .ID property
+
+- AuthenticationConfiguration, Host: Added new .CacheNtlmCredentials which instructs the
+  listener to only authenticate NTLM requests once for any given TCP connection.
   
+- Added new class StorageConnectionStringBuilder, an ADO.NET DbConnectionStringBuilder
+  specialization, which assists with constructing and parsing the forthcoming structured
+  storage connection strings. Completely ripped off from my zuki.data.dbms library.
+  
+- WebApplicationConfiguration / StoragePathProvider : Converted raw .Store processing
+  as a single file name into a "Data Source=" processing based on the connection string
+  to allow for further expansion of that concept for things like pass-through
+  
+- WebApplication: Restart() now waits for a generally reasonable amount of time for the
+  application to actually restart before returning, but that whole TryGetHostWithWait
+  still needs some additional effort to be 'good' .. see comments in ProjectUtil.cpp
+  
+- Host: Uses the HttpListener asynchronous processing model again.  This was removed and
+  replaced with a custom implementation during the alpha builds due to serious problems
+  that kept cropping up. A preprocessor directive was used in the code to make sure it will 
+  be easy to go back to the way things were if testing doesn't go well again.
+
+REMOVALS
+
+- WebApplicationEvents, WebServer, Host: Removed the assembly and resource resolve events.  
+  They didn't work right in 0.2, and fixing them just ended up causing infinite loops since 
+  it would end up re-firing the assembly/resource resolve event over and over as the assembly 
+  was passed back.  It wasn't very useful (as indicated below in the 0.2 notes) as it is, so
+  I just removed them.  One side effect that remains is the ability to properly pass data
+  as a result across the domains, but none of the current handlers take advantage of that.
+  
+BUG FIXES
+
+- Host: It seems they fixed something in .NET, and now when the host is shutdown normally,
+  (Host::Shutdown) we actually get the proper "HostingEnvironment" reason code instead of "None".  
+  This would cause the Host to immediately restart itself while it was trying to shut down, and 
+  caused some weirdness here and there. I left traps for both "None" and "HostingEnvironment" in 
+  place for compatibility with the RTM version of the .NET 2.0 Framework and the patched version.
+
+- ProjectUtil: The FindOpenTcpPort function did not take into account that the port values
+  returned by GetTcpTable are in Network Byte Order and need to be convered to the proper
+  endian-ness before they are useful.
+
 ============
 ZUCCHINI 0.2
 ============

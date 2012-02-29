@@ -152,6 +152,10 @@ void WebApplication::Restart(void)
 
 	ShutdownApplication(m_manager, m_appid);	// Shut it down first
 	ApplicationRestarter::Restart(host);		// Restart the host instance
+
+	// Wait for the host to restart (or fail trying) before returning to caller
+
+	ProjectUtil::TryGetHostWithWait(m_manager, m_appid, host);
 }
 
 //---------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include "AuthenticationConfiguration.h"		// Include AuthenticationConfiguration
 #include "LoggingFormat.h"						// Include LoggingForamt declarations
 #include "ReadOnlyDictionary.h"					// Include ReadOnlyDictionary declarations
+#include "StorageConnectionStringBuilder.h"		// Include StorageConnectionStringBuilder
 #include "UriPrefixCollection.h"				// Include UriPrefixCollection decls
 #include "VirtualFileSystemConfiguration.h"		// Include VirtualFileSystemConfiguration
 #include "XmlConstants.h"						// Include XML constant declarations

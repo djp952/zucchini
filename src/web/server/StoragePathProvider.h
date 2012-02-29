@@ -20,6 +20,7 @@
 
 #include "HashCodeCombiner.h"				// Include HashCodeCombiner decls
 #include "ProjectUtil.h"					// Include ProjectUtil declarations
+#include "StorageConnectionStringBuilder.h"	// Include StorageConnectionStringBuilder
 #include "StorageDirectory.h"				// Include StorageDirectory decls
 #include "StorageFile.h"					// Include StorageFile declarations
 #include "StoragePath.h"					// Include StoragePath declarations
