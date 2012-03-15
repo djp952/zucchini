@@ -155,7 +155,10 @@ void Host::Configure(System::Web::Hosting::ApplicationManager^ appManager,
 	// the calling application. Note that exceptions here should be thrown OK
 	// back to the calling AppDomain since Win32Exception is serializable
 
-	m_listener->IgnoreWriteExceptions = true;
+	// 03.15.2012 - Changed this to FALSE; streaming applications would live forever
+	// and continue to send data if all exceptions are ignored. RequestHandler::SafeOutputWrite() 
+	// will now set IsClientConnected to false after any write exceptions
+	m_listener->IgnoreWriteExceptions = false;
 	m_listener->AuthenticationSchemes = config->Authentication->Schemes;
 	m_listener->Realm = config->Authentication->Realm;
 	m_listener->UnsafeConnectionNtlmAuthentication = config->Authentication->CacheNtlmCredentials;

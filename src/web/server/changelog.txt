@@ -9,6 +9,9 @@ ZUCCHINI 0.4
   file, build\version.ini can be used and checked in to automatically set the base version
   number, or used to override the code to a specific version for compatibility/patching.
 
+- Catch write exceptions during response and set IsClientConnected to false to allow
+  streaming-type applications to know when the client is no longer listening
+
 ============
 ZUCCHINI 0.3
 ============

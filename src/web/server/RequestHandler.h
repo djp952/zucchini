@@ -550,6 +550,9 @@ private:
 	EndOfSendNotification^			m_onEndReq;				// End of request delegate
 	Object^							m_onEndReqState;		// State object for callback
 
+	// CLIENT CONNECTED FLAG
+	bool							m_clientConnected;		// Flag if client is connected
+
 	// HEADER HACKS
 	static PropertyInfo^			s_sentHeaders;			// HttpListenerResponse.SentHeaders
 	static MethodInfo^				s_changeInternalHeader;	// WebHeaderCollection.ChangeInternal

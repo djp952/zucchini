@@ -86,6 +86,12 @@ RequestHandler::RequestHandler(String^ appid, WebApplicationConfiguration^ confi
 
 	m_clientCert = gcnew zws::ClientCertificate(m_context->Request);
 	m_serverCert = gcnew zws::ServerCertificate(m_context->Request);
+
+	// CLIENT CONNECTED FLAG ----------------------------------------
+
+	// Assume the client is connected until an exception occurs writing
+	// data to it. See SafeOutputWrite()
+	m_clientConnected = true;
 }
 
 //---------------------------------------------------------------------------
@@ -1102,7 +1108,7 @@ bool RequestHandler::IsAnonymous::get(void)
 bool RequestHandler::IsClientConnected(void)
 {
 	CHECK_DISPOSED(m_disposed);
-	return __super::IsClientConnected();
+	return (m_clientConnected) ? __super::IsClientConnected() : false;
 }
 
 //---------------------------------------------------------------------------
@@ -1240,9 +1246,7 @@ String^ RequestHandler::RootWebConfigPath::get(void)
 //---------------------------------------------------------------------------
 // RequestHandler::SafeOutputWrite (private)
 //
-// Handles the Response.OutputStream.Write with exception handling, since 
-// apparently the documentation lies and setting .IgnoreWriteException on
-// the listener object doesn't really prevent them from occurring
+// Handles the Response.OutputStream.Write with exception handling
 //
 // Arguments:
 //
@@ -1252,8 +1256,11 @@ String^ RequestHandler::RootWebConfigPath::get(void)
 
 void RequestHandler::SafeOutputWrite(array<Byte>^ buffer, int offset, int length)
 {
+	// This used to just absorb all errors, but streaming applications that continue
+	// to send data to the client would potentially never stop since IsClientConnected
+	// would continually return true
 	try { m_context->Response->OutputStream->Write(buffer, offset, length); }
-	catch(HttpListenerException^) { /* DO NOTHING */ }
+	catch(Exception^) { m_clientConnected = false; }
 }
 
 //---------------------------------------------------------------------------
